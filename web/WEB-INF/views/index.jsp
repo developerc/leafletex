@@ -1,3 +1,5 @@
+<%--ссылка на домашнюю страницу:--%>
+<%--https://github.com/Leaflet/Leaflet.Editable--%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
