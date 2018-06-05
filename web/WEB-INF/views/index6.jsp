@@ -25,6 +25,46 @@
     var map = L.map('map', {editable: true}).setView(startPoint, 16),
         tilelayer = L.tileLayer('http://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {maxZoom: 20, attribution: 'Data \u00a9 <a href="http://www.openstreetmap.org/copyright"> OpenStreetMap Contributors </a> Tiles \u00a9 HOT'}).addTo(map);
 
+    L.EditControl = L.Control.extend({
+
+        options: {
+            position: 'topleft',
+            callback: null,
+            kind: '',
+            html: ''
+        },
+
+        onAdd: function (map) {
+            var container = L.DomUtil.create('div', 'leaflet-control leaflet-bar'),
+                link = L.DomUtil.create('a', '', container);
+
+            link.href = '#';
+            link.title = 'Create a new ' + this.options.kind;
+            link.innerHTML = this.options.html;
+            L.DomEvent.on(link, 'click', L.DomEvent.stop)
+                .on(link, 'click', function () {
+                    window.LAYER = this.options.callback.call(map.editTools);
+                }, this);
+
+            return container;
+        }
+
+    });
+
+    L.NewLineControl = L.EditControl.extend({
+
+        options: {
+            position: 'topleft',
+            callback: map.editTools.startPolyline,
+            kind: 'line',
+            html: '\\/\\'
+        }
+
+    });
+
+    map.addControl(new L.NewLineControl());
+
+
     var line = L.polyline([
         [43.1292, 1.256],
         [43.1295, 1.259],
@@ -40,7 +80,31 @@
     line2.enableEdit();
     map.on('editable:editing', function (e) {
         e.layer.setStyle({color: 'DarkRed'});
+
+       /* myltlng = line2.getLatLng();
+        strltlng = myltlng.toString();
+        console.log(strltlng);*/
     });
+
+    map.on('editable:vertex:ctrlclick editable:vertex:metakeyclick', function (e) {
+        e.vertex.continue();
+    });
+
+    //can grab on to the leaflet draw events here and register whatever we want them to do.
+   /* map.on('draw:created', function (e) {
+        const type = e.layerType;
+        const layer = e.layer;
+
+        // When a user finishes editing a shape we get that information here
+        // editableLayers.addLayer(layer);
+        console.log('draw:created->');
+        console.log(JSON.stringify(layer.toGeoJSON()));
+    });*/
+
+    /*map.on('click', function (e) {
+       alert(line2.latlng);
+    });*/
+
 
 </script>
 </body>
